@@ -3,10 +3,22 @@
  *
  * Via, X and Rains report `hover: none` differently from Edge/Kiwi, so the
  * original narrow-phone media query was skipped and the document could move.
- * Do only the safe document-level fix here. The project's existing mobile
- * layout remains in charge of the phone screen and icon spacing.
+ * Apply the same full-screen shell to every narrow portrait browser, but use
+ * `lvh` (not `dvh`): on the Vivo S9e, Via reports a 778px dynamic viewport
+ * while its actually drawable viewport is only 722px.
  */
 @media (max-width: 600px) and (orientation: portrait) {
+  :root {
+    --phone-screen-width: 100vw;
+    --phone-screen-height: 100lvh;
+    --phone-case-padding: 0px;
+    --phone-case-border-size: 0px;
+    --phone-frame-size: 0px;
+    --phone-screen-radius: 0px;
+    --phone-frame-radius: 0px;
+    --phone-case-radius: 0px;
+  }
+
   html,
   body {
     width: 100%;
@@ -33,13 +45,42 @@
     overflow: hidden;
   }
 
-  /* Preserve the project's original 100lvh screen dimension. `100dvh` was
-     taller than Via's visual viewport on the Vivo S9e (778px vs 722px), which
-     left a blank panel across the splash screen. */
   .phone-shell-wrap,
-  .splash-shell-wrap {
+  .splash-shell-wrap,
+  .phone-case,
+  .phone-frame,
+  .phone-shell,
+  .splash-phone-screen {
     width: 100vw;
     max-width: 100vw;
+  }
+
+  .phone-shell,
+  .splash-phone-screen {
+    height: 100lvh;
+    min-height: 100lvh;
+  }
+
+  /* Remove the desktop decorative frame regardless of the browser's hover
+     media-query report. This is the white panel that covered Via's splash. */
+  .phone-shell-wrap .phone-case {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .phone-shell-wrap .phone-frame {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .phone-shell-wrap .phone-case::before,
+  .phone-shell-wrap .phone-case::after,
+  .phone-shell-wrap .phone-frame::before,
+  .phone-shell-wrap .phone-frame::after {
+    display: none;
   }
 
   .phone-shell,
