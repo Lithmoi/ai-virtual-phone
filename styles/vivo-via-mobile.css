@@ -1,24 +1,12 @@
 /*
  * Android / Via mobile stability layer
  *
- * Some Android browsers do not report `(hover: none) and (pointer: coarse)`
- * consistently. The original mobile rules depended on that query, which made
- * Via fall back to the desktop-sized phone. Keep the document pinned and
- * explicitly apply the phone-sized viewport rules on all narrow portrait
- * screens.
+ * Via, X and Rains report `hover: none` differently from Edge/Kiwi, so the
+ * original narrow-phone media query was skipped and the document could move.
+ * Do only the safe document-level fix here. The project's existing mobile
+ * layout remains in charge of the phone screen and icon spacing.
  */
 @media (max-width: 600px) and (orientation: portrait) {
-  :root {
-    --phone-screen-width: 100vw;
-    --phone-screen-height: 100dvh;
-    --phone-case-padding: 0px;
-    --phone-case-border-size: 0px;
-    --phone-frame-size: 0px;
-    --phone-screen-radius: 0px;
-    --phone-frame-radius: 0px;
-    --phone-case-radius: 0px;
-  }
-
   html,
   body {
     width: 100%;
@@ -38,53 +26,22 @@
   .app-root,
   .app-root.splash-root {
     width: 100vw;
-    height: 100dvh;
-    min-height: 100dvh;
+    height: 100lvh;
+    min-height: 100lvh;
     margin: 0;
     padding: 0;
     overflow: hidden;
   }
 
+  /* Preserve the project's original 100lvh screen dimension. `100dvh` was
+     taller than Via's visual viewport on the Vivo S9e (778px vs 722px), which
+     left a blank panel across the splash screen. */
   .phone-shell-wrap,
-  .splash-shell-wrap,
-  .phone-case,
-  .phone-frame,
-  .phone-shell,
-  .splash-phone-screen {
+  .splash-shell-wrap {
     width: 100vw;
     max-width: 100vw;
   }
 
-  .phone-shell,
-  .splash-phone-screen {
-    height: 100dvh;
-    min-height: 100dvh;
-  }
-
-  /* Remove the desktop phone case on Via too. Without this the splash canvas
-     sits inside a desktop-size frame and a blank frame panel covers it. */
-  .phone-shell-wrap .phone-case {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .phone-shell-wrap .phone-frame {
-    padding: 0;
-    background: transparent;
-    box-shadow: none;
-  }
-
-  .phone-shell-wrap .phone-case::before,
-  .phone-shell-wrap .phone-case::after,
-  .phone-shell-wrap .phone-frame::before,
-  .phone-shell-wrap .phone-frame::after {
-    display: none;
-  }
-
-  /* The fixed page must never receive a drag; chat lists and other app
-     content keep their normal overflow scrolling inside the phone shell. */
   .phone-shell,
   .phone-workspace,
   .phone-app-pane {
@@ -93,9 +50,9 @@
 }
 
 /* Backdrop filters are particularly expensive in Android WebView/Chromium
- * browsers such as Via. On a narrow phone, use the existing translucent
- * colours without continuously compositing large blurred layers. */
-@media (max-width: 600px) and (orientation: portrait) {
+ * browsers such as Via. Restrict this performance fallback to browsers that
+ * do not report `hover: none`; Edge/Kiwi retain their original appearance. */
+@media (max-width: 600px) and (orientation: portrait) and (hover: none) {
   .phone-shell[data-icon-effect="glass"] .icon-glyph-box,
   .phone-shell[data-icon-effect="glass"] .dock,
   .dock,
