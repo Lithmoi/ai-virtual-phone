@@ -1,0 +1,63 @@
+/*
+ * Android / Via mobile stability layer
+ *
+ * Some Android browsers do not match `(hover: none) and (pointer: coarse)`
+ * consistently. When that happened the desktop document stayed scrollable,
+ * making the entire phone move with the finger. Keep the browser document
+ * pinned on every narrow portrait viewport; individual app panels retain
+ * their own scrolling.
+ */
+@media (max-width: 600px) and (orientation: portrait) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden !important;
+    overscroll-behavior: none;
+    background: var(--c-page-body-bg);
+  }
+
+  body {
+    position: fixed;
+    inset: 0;
+  }
+
+  .app-root,
+  .app-root.splash-root {
+    width: 100vw;
+    height: 100dvh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .phone-shell-wrap,
+  .splash-shell-wrap {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  /* The fixed page must never receive a drag; chat lists and other app
+     content keep their normal overflow scrolling inside the phone shell. */
+  .phone-shell,
+  .phone-workspace,
+  .phone-app-pane {
+    overscroll-behavior: contain;
+  }
+}
+
+/* Backdrop filters are particularly expensive in Android WebView/Chromium
+ * browsers such as Via. On a touch phone, use the existing translucent
+ * colours without continuously compositing large blurred layers. */
+@media (max-width: 600px) and (pointer: coarse) {
+  .phone-shell[data-icon-effect="glass"] .icon-glyph-box,
+  .phone-shell[data-icon-effect="glass"] .dock,
+  .dock,
+  .widget-delete-btn {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
