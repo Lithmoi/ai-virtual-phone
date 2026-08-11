@@ -23,6 +23,7 @@
 @import "../styles/interview-magazine.css";
 @import "../styles/cocreate.css";
 @import "../styles/qa.css";
+@import "../styles/vivo-via-mobile.css";
 
 @theme {
   /* 间距 (4px 基准) */
@@ -33,7 +34,7 @@
   --spacing-16: 64px;  --spacing-20: 80px;  --spacing-24: 96px;
 
   /* 圆角 */
-  --radius-xs: 2px;   --radius-sm: 4px;  --radius-md: 8px;
+  --radius-xs: 2px;   --radius-sm: 4px;   --radius-md: 8px;
   --radius-lg: 12px;  --radius-xl: 16px; --radius-2xl: 24px;
   --radius-full: 9999px;
 
