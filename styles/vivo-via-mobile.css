@@ -1,13 +1,24 @@
 /*
  * Android / Via mobile stability layer
  *
- * Some Android browsers do not match `(hover: none) and (pointer: coarse)`
- * consistently. When that happened the desktop document stayed scrollable,
- * making the entire phone move with the finger. Keep the browser document
- * pinned on every narrow portrait viewport; individual app panels retain
- * their own scrolling.
+ * Some Android browsers do not report `(hover: none) and (pointer: coarse)`
+ * consistently. The original mobile rules depended on that query, which made
+ * Via fall back to the desktop-sized phone. Keep the document pinned and
+ * explicitly apply the phone-sized viewport rules on all narrow portrait
+ * screens.
  */
 @media (max-width: 600px) and (orientation: portrait) {
+  :root {
+    --phone-screen-width: 100vw;
+    --phone-screen-height: 100dvh;
+    --phone-case-padding: 0px;
+    --phone-case-border-size: 0px;
+    --phone-frame-size: 0px;
+    --phone-screen-radius: 0px;
+    --phone-frame-radius: 0px;
+    --phone-case-radius: 0px;
+  }
+
   html,
   body {
     width: 100%;
@@ -35,9 +46,41 @@
   }
 
   .phone-shell-wrap,
-  .splash-shell-wrap {
+  .splash-shell-wrap,
+  .phone-case,
+  .phone-frame,
+  .phone-shell,
+  .splash-phone-screen {
     width: 100vw;
     max-width: 100vw;
+  }
+
+  .phone-shell,
+  .splash-phone-screen {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+
+  /* Remove the desktop phone case on Via too. Without this the splash canvas
+     sits inside a desktop-size frame and a blank frame panel covers it. */
+  .phone-shell-wrap .phone-case {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .phone-shell-wrap .phone-frame {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .phone-shell-wrap .phone-case::before,
+  .phone-shell-wrap .phone-case::after,
+  .phone-shell-wrap .phone-frame::before,
+  .phone-shell-wrap .phone-frame::after {
+    display: none;
   }
 
   /* The fixed page must never receive a drag; chat lists and other app
@@ -50,9 +93,9 @@
 }
 
 /* Backdrop filters are particularly expensive in Android WebView/Chromium
- * browsers such as Via. On a touch phone, use the existing translucent
+ * browsers such as Via. On a narrow phone, use the existing translucent
  * colours without continuously compositing large blurred layers. */
-@media (max-width: 600px) and (pointer: coarse) {
+@media (max-width: 600px) and (orientation: portrait) {
   .phone-shell[data-icon-effect="glass"] .icon-glyph-box,
   .phone-shell[data-icon-effect="glass"] .dock,
   .dock,
